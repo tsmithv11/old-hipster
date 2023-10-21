@@ -25,24 +25,23 @@ spec:
       labels:
         app: productcatalogservice
     spec:
-      serviceAccountName: default
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
         image: productcatalogservice
         ports:
         - containerPort: 3550
+        envFrom:
+        - configMapRef:
+            name: lightstep-configmap
         env:
         - name: PORT
           value: "3550"
-        # - name: DISABLE_STATS
-        #   value: "1"
-        # - name: DISABLE_TRACING
-        #   value: "1"
-        # - name: DISABLE_PROFILER
-        #   value: "1"
-        # - name: JAEGER_SERVICE_ADDR
-        #   value: "jaeger-collector:14268"
+        - name: LIGHTSTEP_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+                name: lightstep-credentials
+                key: accessToken
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:3550"]

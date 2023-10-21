@@ -25,16 +25,24 @@ spec:
       labels:
         app: paymentservice
     spec:
-      serviceAccountName: default
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
         image: paymentservice
         ports:
         - containerPort: 50051
+        envFrom:
+        - configMapRef:
+            name: lightstep-configmap
         env:
         - name: PORT
           value: "50051"
+        # Lightstep config
+        - name: LIGHTSTEP_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: lightstep-credentials
+              key: accessToken
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:50051"]

@@ -25,7 +25,6 @@ spec:
       labels:
         app: currencyservice
     spec:
-      serviceAccountName: default
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
@@ -33,15 +32,18 @@ spec:
         ports:
         - name: grpc
           containerPort: 7000
+        envFrom:
+        - configMapRef:
+            name: lightstep-configmap
         env:
         - name: PORT
           value: "7000"
-        # - name: DISABLE_TRACING
-        #   value: "1"
-        # - name: DISABLE_PROFILER
-        #   value: "1"
-        # - name: DISABLE_DEBUGGER
-        #   value: "1"
+        # Lightstep config
+        - name: LIGHTSTEP_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: lightstep-credentials
+              key: accessToken
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:7000"]
