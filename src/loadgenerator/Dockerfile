@@ -1,4 +1,4 @@
-FROM python:3.7.0-slim as builder
+FROM python:3.8.18-slim as builder
 
 RUN apt-get update \ 
     && apt-get install g++ -y \
@@ -11,7 +11,7 @@ RUN pip install --user -r requirements.txt
 COPY . /app
 
 # app image
-FROM python:3.7.0-slim as app
+FROM python:3.8.18-slim as app
 COPY --from=builder /root/.local /root/.local
 COPY --from=builder /app/locustfile.py /app/locustfile.py
 COPY --from=builder /app/loadgen.sh /app/loadgen.sh
